@@ -5,6 +5,7 @@
 #include <string.h> //Para Swap
 
 #define CAPACIDAD_INICIAL 20
+#define FACTOR_REDIMENSION 2
 
 struct heap {
     void** arreglo;
@@ -29,7 +30,6 @@ void imprimir_heap_int(heap_t* heap) {
 size_t capacidad(heap_t* heap) {
     return heap->capacidad;
 }
-//las use para debugear por ahi te sirven 
 
 /* ******************************************************************
  *                       FUNCIONES AUXILIARES
@@ -47,8 +47,7 @@ size_t buscar_pos_hijo_izq (size_t pos_padre) {
     return 2 * pos_padre + 1;
 }
 
-void swap(void *arr, int i, int j, size_t size)
-{
+void swap(void *arr, int i, int j, size_t size) {
     char temp[size];
     char *a = (char*)arr;
 
@@ -57,29 +56,42 @@ void swap(void *arr, int i, int j, size_t size)
     memcpy((a + size * j), temp, size);
 }
 
+// void upheap(heap_t* heap, size_t pos) {
+// 	printf("UPHEAP\n");
+// 	if(pos == 0) { //es un size_t nunca es menor a 0 
+// 		printf("LLegue al inicio del arreglo\n\n");
+// 		return; // LLegue al inicio del arreglo
+// 	} 
+
+// 	size_t pos_padre = buscar_pos_padre(pos);
+// 	printf("pos_padre: %zu, pos_actual: %zu\n", pos_padre, pos);
+// 	printf("Padre: %d, Hijo: %d\n", *((int*)heap->arreglo[pos_padre]), *((int*)heap->arreglo[pos]));
+
+// // 	if(pos_padre == pos){ // Creo que nunca entra acá pero está por las dudas, si no sirve la sacamos
+// // 		printf("pos_padre invalido\n\n");
+// // 		return;
+// // 	} 
+
+// 	if(heap->cmp(heap->arreglo[pos], heap->arreglo[pos_padre]) <= 0){
+// 		printf("El hijo es menor o igual al pos_padre\n\n");
+// 		return;
+// 	} 
+
+// 	swap(heap->arreglo, pos, pos_padre, sizeof(heap->arreglo[0]));
+	
+// 	upheap(heap, pos_padre);
+// }
+
 void upheap(heap_t* heap, size_t pos) {
-	printf("UPHEAP\n");
-	if(pos <= 0){
-		printf("LLegue al inicio del arreglo\n\n");
-		return; // LLegue al inicio del arreglo
-	} 
+	if(pos == 0) return; // LLegue al inicio del arreglo //es un size_t nunca es menor a 0
 
 	size_t pos_padre = buscar_pos_padre(pos);
-	printf("pos_padre: %zu, pos_actual: %zu\n", pos_padre, pos);
-	printf("Padre: %d, Hijo: %d\n", *((int*)heap->arreglo[pos_padre]), *((int*)heap->arreglo[pos]));
 
-	if(pos_padre == pos){ // Creo que nunca entra acá pero está por las dudas, si no sirve la sacamos
-		printf("pos_padre invalido\n\n");
-		return;
-	} 
+	//if(pos_padre == pos) return; //no es necesario creo
 
-	if(heap->cmp(heap->arreglo[pos], heap->arreglo[pos_padre]) <= 0){
-		printf("El hijo es menor o igual al pos_padre\n\n");
-		return;
-	} 
+	if(heap->cmp(heap->arreglo[pos], heap->arreglo[pos_padre]) <= 0) return;
 
 	swap(heap->arreglo, pos, pos_padre, sizeof(heap->arreglo[0]));
-	
 	upheap(heap, pos_padre);
 }
 
@@ -129,9 +141,17 @@ heap_t *heap_crear(cmp_func_t cmp) {
 
 // }
 
-// void heap_destruir(heap_t *heap, void (*destruir_elemento)(void *e)) {
+void heap_destruir(heap_t *heap, void (*destruir_elemento)(void *e)) {
+    void** arr = heap->arreglo;
 
-// }
+    if (destruir_elemento) {
+        for (size_t i = 0; i < heap->cantidad; i++) {
+            destruir_elemento(arr[i]);
+        }
+    }
+    free(arr);
+    free(heap);
+}
 
 size_t heap_cantidad(const heap_t *heap) {
     return heap->cantidad;
@@ -144,13 +164,15 @@ bool heap_esta_vacio(const heap_t *heap) {
 
 bool heap_encolar(heap_t *heap, void *elem) {
 
-	if(!elem) return false;
+	// if(!elem) return false; podria almacenar NULL
 
 	heap->arreglo[heap->cantidad] = elem;
-	heap->cantidad++;
+	
+	upheap(heap, heap->cantidad);
+    heap->cantidad++;
 
-	upheap(heap, heap->cantidad-1);
-	return true;
+    if (heap->capacidad == heap->cantidad) return redimensior_heap(heap, heap->capacidad * FACTOR_REDIMENSION);
+    return true;
 }
 
 void *heap_ver_max(const heap_t *heap) {
