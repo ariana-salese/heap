@@ -34,15 +34,15 @@ size_t capacidad(heap_t* heap) {
  * *****************************************************************/
 
 size_t buscar_pos_padre (size_t pos_hijo) {
-    return (pos_hijo - 1);
+    return (pos_hijo - 1) / 2;
 }
 
 size_t buscar_pos_hijo_der (size_t pos_padre) {
-    return 2 * (pos_padre + 2);
+    return 2 * pos_padre + 2;
 }
 
 size_t buscar_pos_hijo_izq (size_t pos_padre) {
-    return 2 * (pos_padre + 1);
+    return 2 * pos_padre + 1;
 }
 
 heap_t* _heap_crear(cmp_func_t cmp) {
