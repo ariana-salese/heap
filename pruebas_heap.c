@@ -23,11 +23,11 @@ int cmp_ints(const void *a, const void *b) {
 }
 
 int cmp_lista(const void* lista1, const void* lista2) {
-	int largo1 = lista_largo(lista1);
-	int largo2 = lista_largo(lista2);
+	// size_t largo1 = lista_largo(lista1);
+	// size_t largo2 = lista_largo(lista2);
 
-	if (largo1 > largo2) return 1;
-	if (largo1 < largo2) return 1;
+	// if (largo1 > largo2) return 1;
+	// if (largo1 < largo2) return 1;
 	return 0;
 }
 

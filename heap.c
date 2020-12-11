@@ -47,7 +47,7 @@ size_t buscar_pos_hijo_izq (size_t pos_padre) {
     return 2 * pos_padre + 1;
 }
 
-void swap(void *arr, int i, int j, size_t size) {
+void swap(void *arr, size_t i, size_t j, size_t size) {
     char temp[size];
     char *a = (char*)arr;
 
