@@ -85,4 +85,8 @@ void *heap_desencolar(heap_t *heap);
 
 void pruebas_heap_estudiante(void);
 
+//Eliminar
+void imprimir_heap_int(heap_t* heap);
+size_t capacidad(heap_t* heap);
+
 #endif  // HEAP_H
