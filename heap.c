@@ -57,18 +57,13 @@ void swap(void *arr, size_t i, size_t j, size_t size) {
     memcpy((a + size * j), temp, size);
 }
 
-size_t buscar_pos_max(void** arr, cmp_func_t cmp, size_t pos_padre, size_t pos_h) {
-    if (cmp(arr[pos_padre], arr[pos_h]) > 0) return pos_padre;
-    return pos_h;
-}
-
 size_t buscar_pos_max_tres (heap_t* heap, size_t pos_padre, size_t pos_h_izq, size_t pos_h_der) {
     size_t largo = heap->cantidad;
     void** arr = heap->arreglo;
     cmp_func_t cmp = heap->cmp;
  
     if (pos_h_izq > largo) return pos_padre; //arbol izq, si noy hay hijo izq no hay der
-    if (pos_h_der > largo) return buscar_pos_max(heap->arreglo, cmp, pos_padre, pos_h_izq);
+    if (pos_h_der > largo) return cmp(arr[pos_padre], arr[pos_h_izq]) > 0 ? pos_padre : pos_h_izq;
 
     void* hijo_der = arr[pos_h_der];
     void* hijo_izq = arr[pos_h_izq];
@@ -80,32 +75,6 @@ size_t buscar_pos_max_tres (heap_t* heap, size_t pos_padre, size_t pos_h_izq, si
     return pos_padre;
 }
 
-// void upheap(heap_t* heap, size_t pos) {
-// 	printf("UPHEAP\n");
-// 	if(pos == 0) { //es un size_t nunca es menor a 0 
-// 		printf("LLegue al inicio del arreglo\n\n");
-// 		return; // LLegue al inicio del arreglo
-// 	} 
-
-// 	size_t pos_padre = buscar_pos_padre(pos);
-// 	printf("pos_padre: %zu, pos_actual: %zu\n", pos_padre, pos);
-// 	printf("Padre: %d, Hijo: %d\n", *((int*)heap->arreglo[pos_padre]), *((int*)heap->arreglo[pos]));
-
-// // 	if(pos_padre == pos){ // Creo que nunca entra acá pero está por las dudas, si no sirve la sacamos
-// // 		printf("pos_padre invalido\n\n");
-// // 		return;
-// // 	} 
-
-// 	if(heap->cmp(heap->arreglo[pos], heap->arreglo[pos_padre]) <= 0){
-// 		printf("El hijo es menor o igual al pos_padre\n\n");
-// 		return;
-// 	} 
-
-// 	swap(heap->arreglo, pos, pos_padre, sizeof(heap->arreglo[0]));
-	
-// 	upheap(heap, pos_padre);
-// }
-
 void upheap(heap_t* heap, size_t pos) {
 	if(pos == 0) return; // LLegue al inicio del arreglo 
 
@@ -116,47 +85,6 @@ void upheap(heap_t* heap, size_t pos) {
 	swap(heap->arreglo, pos, pos_padre, sizeof(heap->arreglo[0]));
 	upheap(heap, pos_padre);
 }
-
-// void downheap(heap_t* heap, size_t pos) {
-// 	size_t pos_hijo_der = buscar_pos_hijo_der(pos);
-// 	size_t pos_hijo_izq = buscar_pos_hijo_izq(pos);
-
-// 	//Son para que todas las comparaciones queden mucho más legibles
-// 	void* elem_act = heap->arreglo[pos];
-// 	void* elem_izq;
-// 	void* elem_der;
-
-// 	size_t nuevo_act;
-
-// 	if(pos_hijo_izq >= heap->cantidad && pos_hijo_der >= heap->cantidad) return; // No tiene hijos
-
-// 	if(pos_hijo_izq >= heap->cantidad) { // Solo tiene hijo derecho
-// 		elem_der = heap->arreglo[pos_hijo_der];
-// 		if(heap->cmp(elem_act, elem_der) > 0) return;
-// 		nuevo_act = pos_hijo_der;
-// 	}
-// 	else if(pos_hijo_der >= heap->cantidad) { // Solo tiene hijo izquierdo
-// 		elem_izq = heap->arreglo[pos_hijo_izq];
-// 		if(heap->cmp(elem_act, elem_izq) > 0) return;
-// 		nuevo_act = pos_hijo_izq;
-// 	}
-// 	else { //Tiene dos hijos
-// 		elem_izq = heap->arreglo[pos_hijo_izq];
-// 		elem_der = heap->arreglo[pos_hijo_der];
-// 		// Si actual es mayor a ambos
-// 		if(heap->cmp(elem_act, elem_der) > 0 && heap->cmp(elem_act, elem_izq) > 0) return;
-// 		// Si derecho es mayor a ambos
-// 		else if(heap->cmp(elem_der, elem_act) > 0 && heap->cmp(elem_der, elem_izq) > 0) nuevo_act = pos_hijo_der;
-// 		// Si izquierdo es mayor a ambos
-// 		else if(heap->cmp(elem_izq, elem_act) > 0 && heap->cmp(elem_izq, elem_der) > 0) nuevo_act = pos_hijo_izq;
-// 		// Si izquierdo y derecho son iguales
-// 		else if(heap->cmp(elem_izq, elem_der) == 0) nuevo_act = pos_hijo_izq;
-// 		// En otro caso
-// 		else return;
-// 	}
-// 	swap(heap->arreglo, pos, nuevo_act, sizeof(heap->arreglo[0]));
-// 	downheap(heap, nuevo_act);
-// }
 
 void downheap(heap_t* heap, size_t pos) {
     if (pos >= heap->cantidad - 1) return;
@@ -265,7 +193,7 @@ void *heap_desencolar(heap_t *heap) {
     downheap(heap, 0);
 
     if (heap->cantidad <= heap->capacidad / DISP_DECREMENTO && heap->capacidad > CAPACIDAD_INICIAL) {
-        if (!redimensionar_heap(heap, heap->capacidad / FACTOR_REDIMENSION)) return NULL; //no? podria tener error en el medio
+        if (!redimensionar_heap(heap, heap->capacidad / FACTOR_REDIMENSION)) return NULL; 
     }
     return elem;
 }

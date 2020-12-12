@@ -68,6 +68,33 @@ void imprimir_arreglo_int(int* arr, size_t largo) {
     printf("]\n");
 }
 
+static void prueba_encolar() {
+	printf("\n> Prueba encolar algunos elementos:\n");
+
+	heap_t* heap = heap_crear(cmp_ints);
+
+	print_test("Se creo el heap", heap);
+
+	int arr[] = {5, 0, 8, 9, 6, 2, 1, 7, 5, 4, 3, 10, 2, 14, -4};
+	//int arr_final[] = {14, 8, 10, 7, 6, 5, 9, 0, 5, 4, 3, 2, 2, 1, -4};
+
+	bool resultado_encolar = true;
+	bool resultado_mayor = true;
+	bool resultado_cantidad = true;
+
+	for (size_t i = 0; i < CANTIDAD_ELEMENTOS && resultado_encolar; i++) {
+		if (!heap_encolar(heap, &arr[i])) resultado_encolar = false;
+		if (*(int*)heap_ver_max(heap) != buscar_mayor(arr, i + 1)) resultado_mayor = false;
+		if (heap_cantidad(heap) != i + 1) resultado_cantidad = false;
+	}
+
+	print_test("Se encolaron varios elementos", resultado_encolar);
+	print_test("La cantidad de elementos se actualizo correctamente", resultado_cantidad);
+	print_test("El mayor siempre es el primero del heap", resultado_mayor);
+	
+	heap_destruir(heap, NULL);
+}
+
 void nuestras_pruebas_marce() {
 
 	int arr[] = {5, 0, 8, 9, 6, 2, 1, 7, 5, 4, 3, 10, 2, 14, -4};
@@ -163,33 +190,6 @@ static void prueba_insertar() {
 	heap_destruir(heap, NULL);
 }
 
-// static void prueba_encolar() {
-// 	printf("\n> Prueba encolar algunos elementos:\n");
-
-// 	heap_t* heap = heap_crear(cmp_ints);
-
-// 	print_test("Se creo el heap", heap);
-
-// 	int arr[] = {5, 0, 8, 9, 6, 2, 1, 7, 5, 4, 3, 10, 2, 14, -4};
-// 	//int arr_final[] = {14, 8, 10, 7, 6, 5, 9, 0, 5, 4, 3, 2, 2, 1, -4};
-
-// 	bool resultado_encolar = true;
-// 	bool resultado_mayor = true;
-// 	bool resultado_cantidad = true;
-
-// 	for (size_t i = 0; i < CANTIDAD_ELEMENTOS && resultado_encolar; i++) {
-// 		if (!heap_encolar(heap, &arr[i])) resultado_encolar = false;
-// 		if (*(int*)heap_ver_max(heap) != buscar_mayor(arr, i + 1)) resultado_mayor = false;
-// 		if (heap_cantidad(heap) != i + 1) resultado_cantidad = false;
-// 	}
-
-// 	print_test("Se encolaron varios elementos", resultado_encolar);
-// 	print_test("La cantidad de elementos se actualizo correctamente", resultado_cantidad);
-// 	print_test("El mayor siempre es el primero del heap", resultado_mayor);
-	
-// 	heap_destruir(heap, NULL);
-// }
-
 static void prueba_destruir_heap_con_free() {
 	printf("\n> Prueba destruir con free\n");
 
@@ -262,6 +262,7 @@ static void prueba_encolar_null() {
 void nuestras_pruebas() {
 	nuestras_pruebas_marce();
 	//prueba_upheap();
+	//prueba_encolar();
 }
 
 void pruebas_heap_estudiante() {
