@@ -129,32 +129,66 @@ static void prueba_crear_heap_vacio() {
 	heap_destruir(heap, NULL);
 }
 
-static void prueba_encolar() {
-	printf("\n> Prueba encolar algunos elementos:\n");
-
+static void prueba_insertar() {
+	printf("\n> Prueba insertar algunos elementos\n");
 	heap_t* heap = heap_crear(cmp_ints);
 
 	print_test("Se creo el heap", heap);
 
-	int arr[] = {5, 0, 8, 9, 6, 2, 1, 7, 5, 4, 3, 10, 2, 14, -4};
-	//int arr_final[] = {14, 8, 10, 7, 6, 5, 9, 0, 5, 4, 3, 2, 2, 1, -4};
+	int valor1 = 3, valor2 = 9, valor3 = 0, valor4 = 10;
 
-	bool resultado_encolar = true;
-	bool resultado_mayor = true;
-	bool resultado_cantidad = true;
+	/* encola los elementos */
+	print_test("Se encolo valor1", heap_encolar(heap, &valor1));
+	print_test("Se encolo valor2", heap_encolar(heap, &valor2));
+	print_test("Se encolo valor3", heap_encolar(heap, &valor3));
+	print_test("Se encolo valor4", heap_encolar(heap, &valor4));
 
-	for (size_t i = 0; i < CANTIDAD_ELEMENTOS && resultado_encolar; i++) {
-		if (!heap_encolar(heap, &arr[i])) resultado_encolar = false;
-		if (*(int*)heap_ver_max(heap) != buscar_mayor(arr, i + 1)) resultado_mayor = false;
-		if (heap_cantidad(heap) != i + 1) resultado_cantidad = false;
-	}
+	imprimir_heap_int(heap);
 
-	print_test("Se encolaron varios elementos", resultado_encolar);
-	print_test("La cantidad de elementos se actualizo correctamente", resultado_cantidad);
-	print_test("El mayor siempre es el primero del heap", resultado_mayor);
-	
+	print_test("La cantidad de elementos es 4", heap_cantidad(heap) == 4);
+	print_test("Ver mayor devuelve el mas grande", *(int*)heap_ver_max(heap));
+
+	/* desencola 2 elementos */
+	print_test("Desencolar devuelve el mayor", *(int*)heap_desencolar(heap) == valor4);
+	print_test("La cantidad de elementos es 3", heap_cantidad(heap) == 3);
+	print_test("Ver maximo devuleve el proximo maximo", *(int*)heap_ver_max(heap) == valor2);
+	imprimir_heap_int(heap);
+
+	print_test("Desencolar nuevamente devuelve el mayor", *(int*)heap_desencolar(heap) == valor2);
+	imprimir_heap_int(heap);
+	print_test("La cantidad de elementos es 2", heap_cantidad(heap) == 2);
+
+	print_test("El primero del arreglo es el mayor actual", *(int*)heap_ver_max(heap) == valor1);
+
 	heap_destruir(heap, NULL);
 }
+
+// static void prueba_encolar() {
+// 	printf("\n> Prueba encolar algunos elementos:\n");
+
+// 	heap_t* heap = heap_crear(cmp_ints);
+
+// 	print_test("Se creo el heap", heap);
+
+// 	int arr[] = {5, 0, 8, 9, 6, 2, 1, 7, 5, 4, 3, 10, 2, 14, -4};
+// 	//int arr_final[] = {14, 8, 10, 7, 6, 5, 9, 0, 5, 4, 3, 2, 2, 1, -4};
+
+// 	bool resultado_encolar = true;
+// 	bool resultado_mayor = true;
+// 	bool resultado_cantidad = true;
+
+// 	for (size_t i = 0; i < CANTIDAD_ELEMENTOS && resultado_encolar; i++) {
+// 		if (!heap_encolar(heap, &arr[i])) resultado_encolar = false;
+// 		if (*(int*)heap_ver_max(heap) != buscar_mayor(arr, i + 1)) resultado_mayor = false;
+// 		if (heap_cantidad(heap) != i + 1) resultado_cantidad = false;
+// 	}
+
+// 	print_test("Se encolaron varios elementos", resultado_encolar);
+// 	print_test("La cantidad de elementos se actualizo correctamente", resultado_cantidad);
+// 	print_test("El mayor siempre es el primero del heap", resultado_mayor);
+	
+// 	heap_destruir(heap, NULL);
+// }
 
 static void prueba_destruir_heap_con_free() {
 	printf("\n> Prueba destruir con free\n");
@@ -208,36 +242,35 @@ static void prueba_destruir_heap_con_otra_funcion_de_destruccion() {
 static void prueba_encolar_null() {
 	printf("\n> Prueba encolar NULL\n");
 
-	heap_t* heap = heap_crear(cmp_null);
+	heap_t* heap = heap_crear(cmp_str);
 
 	/* encola NULLs */
 	bool resultado_encolar = true;
 
 	for (size_t i = 0; i < CANTIDAD_ELEMENTOS; i++) {
-		if (!heap_encolar(heap, NULL)) resultado_encolar = false;
+		if (heap_encolar(heap, NULL)) resultado_encolar = false;
 	}
 
-	print_test("Se encolaron NULLs", resultado_encolar);
-	print_test("La cantidad de elementos es correcta", heap_cantidad(heap) == CANTIDAD_ELEMENTOS);
+	print_test("Encolar NULL devuelve false", resultado_encolar);
+	print_test("La cantidad de elementos es 0", heap_cantidad(heap) == 0);
 	print_test("Ver maximo devuelve NULL", !heap_ver_max(heap));
 	print_test("Desencolar devuelve NULL", !heap_desencolar(heap));
-	print_test("Pero se elimino un elemento", heap_cantidad(heap) == CANTIDAD_ELEMENTOS - 1);
 
 	heap_destruir(heap, NULL);
 }
 
 void nuestras_pruebas() {
 	nuestras_pruebas_marce();
-	prueba_upheap();
+	//prueba_upheap();
 }
 
 void pruebas_heap_estudiante() {
-   	prueba_crear_heap_vacio();
+   	//prueba_crear_heap_vacio();
 	// prueba_crear_heap_con_arr();
-	prueba_encolar();
+	//prueba_insertar();
 	// prueba_desencolar(); //estas podriamos metarla en uno o maybe si es repetitivo por lo que hagamos en la de voluemn lo podemos borrar
-	prueba_destruir_heap_con_free();
-	prueba_destruir_heap_con_otra_funcion_de_destruccion();
+	//prueba_destruir_heap_con_free();
+	//prueba_destruir_heap_con_otra_funcion_de_destruccion();
 	//prueba_encolar_null();
 	// prueba_de_volumen();
 	// prueba_heap_sort();
