@@ -81,6 +81,12 @@ void nuestras_pruebas_marce() {
 		printf("\n\n");
 	}
 
+	for(int i = 0; i < CANTIDAD_ELEMENTOS; i++){
+		printf("Desencolo, recibí: %d\n", *((int*)heap_desencolar(heap)));
+		imprimir_heap_int(heap);
+		printf("\n\n");
+	}
+
 }
 
 static void prueba_upheap() {
@@ -232,9 +238,10 @@ void pruebas_heap_estudiante() {
 	// prueba_desencolar(); //estas podriamos metarla en uno o maybe si es repetitivo por lo que hagamos en la de voluemn lo podemos borrar
 	prueba_destruir_heap_con_free();
 	prueba_destruir_heap_con_otra_funcion_de_destruccion();
-	prueba_encolar_null();
+	//prueba_encolar_null();
 	// prueba_de_volumen();
 	// prueba_heap_sort();
+	nuestras_pruebas();
 }
 
 // //#ifndef CORRECTOR

@@ -6,6 +6,7 @@
 
 #define CAPACIDAD_INICIAL 20
 #define FACTOR_REDIMENSION 2
+#define DISP_DECREMENTO 4 //DISP por "disparador" o "trigger"
 
 struct heap {
     void** arreglo;
@@ -93,6 +94,47 @@ void upheap(heap_t* heap, size_t pos) {
 	upheap(heap, pos_padre);
 }
 
+void downheap(heap_t* heap, size_t pos) {
+	size_t pos_hijo_der = buscar_pos_hijo_der(pos);
+	size_t pos_hijo_izq = buscar_pos_hijo_izq(pos);
+
+	//Son para que todas las comparaciones queden mucho más legibles
+	void* elem_act = heap->arreglo[pos];
+	void* elem_izq;
+	void* elem_der;
+
+	size_t nuevo_act;
+
+	if(pos_hijo_izq >= heap->cantidad && pos_hijo_der >= heap->cantidad) return; // No tiene hijos
+
+	if(pos_hijo_izq >= heap->cantidad) { // Solo tiene hijo derecho
+		elem_der = heap->arreglo[pos_hijo_der];
+		if(heap->cmp(elem_act, elem_der) > 0) return;
+		nuevo_act = pos_hijo_der;
+	}
+	else if(pos_hijo_der >= heap->cantidad){ // Solo tiene hijo izquierdo
+		elem_izq = heap->arreglo[pos_hijo_izq];
+		if(heap->cmp(elem_act, elem_izq) > 0) return;
+		nuevo_act = pos_hijo_izq;
+	}
+	else{ //Tiene dos hijos
+		elem_izq = heap->arreglo[pos_hijo_izq];
+		elem_der = heap->arreglo[pos_hijo_der];
+		// Si actual es mayor a ambos
+		if(heap->cmp(elem_act, elem_der) > 0 && heap->cmp(elem_act, elem_izq) > 0) return;
+		// Si derecho es mayor a ambos
+		else if(heap->cmp(elem_der, elem_act) > 0 && heap->cmp(elem_der, elem_izq) > 0) nuevo_act = pos_hijo_der;
+		// Si izquierdo es mayor a ambos
+		else if(heap->cmp(elem_izq, elem_act) > 0 && heap->cmp(elem_izq, elem_der) > 0) nuevo_act = pos_hijo_izq;
+		// Si izquierdo y derecho son iguales
+		else if(heap->cmp(elem_izq, elem_der) == 0) nuevo_act = pos_hijo_izq;
+		// En otro caso
+		else return;
+	}
+	swap(heap->arreglo, pos, nuevo_act, sizeof(heap->arreglo[0]));
+	downheap(heap, nuevo_act);
+}
+
 heap_t* _heap_crear(cmp_func_t cmp) {
     heap_t* heap = malloc(sizeof(heap_t));
     if (!heap) return NULL;
@@ -104,7 +146,7 @@ heap_t* _heap_crear(cmp_func_t cmp) {
     return heap;
 }
 
-bool redimensior_heap(heap_t* heap, size_t nueva_capacidad) {
+bool redimensior_heap(heap_t* heap, size_t nueva_capacidad) { // redimensior lo escibiste asi por algo o es typo?
     void** nuevo_arr = realloc(heap->arreglo, sizeof(void*) * nueva_capacidad);
     if (!nuevo_arr) return false;
 
@@ -177,7 +219,14 @@ void *heap_ver_max(const heap_t *heap) {
 void *heap_desencolar(heap_t *heap) {
     if (heap->cantidad == 0) return NULL;
 
+    void* elem = heap->arreglo[0];
+    heap->arreglo[0] = heap->arreglo[heap->cantidad - 1];
+
     heap->cantidad--;
+    downheap(heap, 0);
+
+    if (heap->cantidad <= heap->capacidad/DISP_DECREMENTO && heap->capacidad > CAPACIDAD_INICIAL) redimensior_heap(heap, heap->capacidad / FACTOR_REDIMENSION);
+    return elem;
 }
 
 // void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp) { NO SE SI ES PRIMITIVA
