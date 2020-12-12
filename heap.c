@@ -47,7 +47,7 @@ size_t buscar_pos_hijo_izq (size_t pos_padre) {
     return 2 * pos_padre + 1;
 }
 
-void swap(void *arr, int i, int j, size_t size) {
+void swap(void *arr, size_t i, size_t j, size_t size) {
     char temp[size];
     char *a = (char*)arr;
 
@@ -83,11 +83,9 @@ void swap(void *arr, int i, int j, size_t size) {
 // }
 
 void upheap(heap_t* heap, size_t pos) {
-	if(pos == 0) return; // LLegue al inicio del arreglo //es un size_t nunca es menor a 0
+	if(pos == 0) return; // LLegue al inicio del arreglo 
 
 	size_t pos_padre = buscar_pos_padre(pos);
-
-	//if(pos_padre == pos) return; //no es necesario creo
 
 	if(heap->cmp(heap->arreglo[pos], heap->arreglo[pos_padre]) <= 0) return;
 
@@ -161,10 +159,7 @@ bool heap_esta_vacio(const heap_t *heap) {
     return heap->cantidad == 0;
 }
 
-
 bool heap_encolar(heap_t *heap, void *elem) {
-
-	// if(!elem) return false; podria almacenar NULL
 
 	heap->arreglo[heap->cantidad] = elem;
 	
@@ -179,9 +174,11 @@ void *heap_ver_max(const heap_t *heap) {
     return heap->arreglo[0];
 }
 
-// void *heap_desencolar(heap_t *heap) {
+void *heap_desencolar(heap_t *heap) {
+    if (heap->cantidad == 0) return NULL;
 
-// }
+    heap->cantidad--;
+}
 
 // void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp) { NO SE SI ES PRIMITIVA
 
