@@ -32,6 +32,15 @@ size_t capacidad(heap_t* heap) {
     return heap->capacidad;
 }
 
+void imprimir_arr_int(void *arr[], size_t n) {
+    printf("[");
+    for (size_t i = 0; i < n; i++) {
+        printf("%i", *(int*)arr[i]);
+        if (i != n - 1) printf(", ");
+    }
+    printf("]\n");
+}
+
 /* ******************************************************************
  *                       FUNCIONES AUXILIARES
  * *****************************************************************/
@@ -58,9 +67,9 @@ void swap(void *arr, size_t i, size_t j, size_t size) {
 }
 
 size_t buscar_pos_max_tres (void* arr[], cmp_func_t cmp, size_t largo, size_t pos_padre, size_t pos_h_izq, size_t pos_h_der) {
- 
-    if (pos_h_izq > largo) return pos_padre; //arbol izq, si noy hay hijo izq no hay der
-    if (pos_h_der > largo) return cmp(arr[pos_padre], arr[pos_h_izq]) > 0 ? pos_padre : pos_h_izq;
+ 	
+    if (pos_h_izq >= largo) return pos_padre; //arbol izq, si noy hay hijo izq no hay der
+    if (pos_h_der >= largo) return cmp(arr[pos_padre], arr[pos_h_izq]) > 0 ? pos_padre : pos_h_izq;
 
     void* hijo_der = arr[pos_h_der];
     void* hijo_izq = arr[pos_h_izq];
@@ -95,6 +104,12 @@ void downheap(void* arr[], size_t largo, cmp_func_t cmp, size_t pos) {
         swap(arr, pos, pos_mayor, sizeof(void*));
         downheap(arr, largo, cmp, pos_mayor);
     }
+}
+
+void heapify(void *elementos[], size_t largo, cmp_func_t cmp) {
+	for(size_t i = largo; i > 0; i--){	
+		downheap(elementos, largo, cmp, i - 1);
+	}
 }
 
 heap_t* _heap_crear(cmp_func_t cmp) {
@@ -137,11 +152,17 @@ heap_t *heap_crear(cmp_func_t cmp) {
     return heap;
 }
 
-// heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp) {
-//     heap_t* heap =_heap_crear(cmp);
-//     if (!heap) return NULL;
+heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp) {
+	heap_t* heap =_heap_crear(cmp);
+	if (!heap) return NULL;
 
-// }
+	heapify(arreglo, n, cmp);
+
+	heap->arreglo = arreglo;
+	heap->cantidad = n;
+
+	return heap;
+}
 
 void heap_destruir(heap_t *heap, void (*destruir_elemento)(void *e)) {
     void** arr = heap->arreglo;
@@ -212,7 +233,7 @@ void *heap_desencolar(heap_t *heap) {
 
 // VERSION 2
 void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp) { 
-    heapify(elementos);
+    heapify(elementos, cant, cmp);
     size_t largo = cant - 1;
 
     for (size_t i = 0; i < cant; i++, largo--) {

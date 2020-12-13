@@ -116,6 +116,22 @@ void nuestras_pruebas_marce() {
 
 }
 
+void nuestras_pruebas_marce_2() {
+
+	int arr[] = {5, 0, 8, 9, 6, 2, 1, 7, 5, 4, 3, 10, 2, 14, -4};
+	void* arr_2[] = {arr, arr+1, arr+2, arr+3, arr+4, arr+5, arr+6, arr+7, arr+8, arr+9, arr+10, arr+11, arr+12, arr+13, arr+14};
+	//int arr_final[] = {14, 8, 10, 7, 6, 5, 9, 0, 5, 4, 3, 2, 2, 1, -4}; //lo verifique a mano asi que lo podemos usar pa las pruebas  
+
+	heap_t* heap = heap_crear_arr(arr_2, CANTIDAD_ELEMENTOS, cmp_ints);
+
+	for(int i = 0; i < CANTIDAD_ELEMENTOS; i++){
+		printf("Desencolo, recibí: %d\n", *((int*)heap_desencolar(heap)));
+		imprimir_heap_int(heap);
+		printf("\n\n");
+	}
+
+}
+
 static void prueba_upheap() {
     printf("\nPRUEBA UPHEAP:\n");
     heap_t* heap = heap_crear(cmp_ints);
@@ -260,7 +276,8 @@ static void prueba_encolar_null() {
 }
 
 void nuestras_pruebas() {
-	nuestras_pruebas_marce();
+	//nuestras_pruebas_marce();
+	//nuestras_pruebas_marce_2();
 	//prueba_upheap();
 	//prueba_encolar();
 }
