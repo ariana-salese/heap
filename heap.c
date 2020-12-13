@@ -107,18 +107,25 @@ void downheap(void* arr[], size_t largo, cmp_func_t cmp, size_t pos) {
 }
 
 void heapify(void *elementos[], size_t largo, cmp_func_t cmp) {
-	for(size_t i = largo; i > 0; i--){	
+	for (size_t i = largo; i > 0; i--) {	
 		downheap(elementos, largo, cmp, i - 1);
 	}
 }
 
-heap_t* _heap_crear(cmp_func_t cmp) {
+heap_t* _heap_crear(cmp_func_t cmp, size_t capacidad) {
     heap_t* heap = malloc(sizeof(heap_t));
     if (!heap) return NULL;
 
+    void** arreglo = malloc(sizeof(void*) * capacidad);
+    if (!arreglo) {
+        free(heap);
+        return NULL;
+    }
+
     heap->cmp = cmp;
     heap->cantidad = 0;
-    heap->capacidad = CAPACIDAD_INICIAL;
+    heap->capacidad = capacidad;
+    heap->arreglo = arreglo;
 
     return heap;
 }
@@ -138,27 +145,36 @@ bool redimensionar_heap(heap_t* heap, size_t nueva_capacidad) {
  * *****************************************************************/
 
 heap_t *heap_crear(cmp_func_t cmp) {
-    heap_t* heap =_heap_crear(cmp);
+    heap_t* heap =_heap_crear(cmp, CAPACIDAD_INICIAL);
     if (!heap) return NULL;
-
-    void** arreglo = malloc(sizeof(void*) * CAPACIDAD_INICIAL);
-    if (!arreglo) {
-        free(heap);
-        return NULL;
-    }
-
-    heap->arreglo = arreglo;
 
     return heap;
 }
 
 heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp) {
-	heap_t* heap =_heap_crear(cmp);
+    size_t capacidad = CAPACIDAD_INICIAL;
+    if (n == capacidad) capacidad = CAPACIDAD_INICIAL * FACTOR_REDIMENSION;
+    if (n > capacidad * 2) capacidad = CAPACIDAD_INICIAL * FACTOR_REDIMENSION * n;
+
+	heap_t* heap =_heap_crear(cmp, capacidad);
 	if (!heap) return NULL;
 
 	heapify(arreglo, n, cmp);
 
-	heap->arreglo = arreglo;
+	for (size_t i = 0; i < n; i++) {
+        heap->arreglo[i] = arreglo[i];
+    }
+    /*
+    Si no fue creado dinamicamente despues colapsa destruir, serian muchas cosas a verificar. 
+    porque si se redimensiono deberiamos liberarlo. pero si no, no. entonces habria que 
+    verificar que que fie creado con arr y no se redimensiono. ni idea jeje. 
+
+    ademas se podria modificar desde afuera
+    
+    si se te ocurre una forma mas elegante joya. 
+
+    Con lo que puse sigue cumpliendo con la complejidad
+    */
 	heap->cantidad = n;
 
 	return heap;
