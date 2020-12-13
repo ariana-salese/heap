@@ -57,10 +57,7 @@ void swap(void *arr, size_t i, size_t j, size_t size) {
     memcpy((a + size * j), temp, size);
 }
 
-size_t buscar_pos_max_tres (heap_t* heap, size_t pos_padre, size_t pos_h_izq, size_t pos_h_der) {
-    size_t largo = heap->cantidad;
-    void** arr = heap->arreglo;
-    cmp_func_t cmp = heap->cmp;
+size_t buscar_pos_max_tres (void* arr[], cmp_func_t cmp, size_t largo, size_t pos_padre, size_t pos_h_izq, size_t pos_h_der) {
  
     if (pos_h_izq > largo) return pos_padre; //arbol izq, si noy hay hijo izq no hay der
     if (pos_h_der > largo) return cmp(arr[pos_padre], arr[pos_h_izq]) > 0 ? pos_padre : pos_h_izq;
@@ -86,17 +83,17 @@ void upheap(heap_t* heap, size_t pos) {
 	upheap(heap, pos_padre);
 }
 
-void downheap(heap_t* heap, size_t pos) {
-    if (pos >= heap->cantidad - 1) return;
+void downheap(void* arr[], size_t largo, cmp_func_t cmp, size_t pos) {
+    if (pos >= largo - 1) return;
     
     size_t pos_h_der = buscar_pos_hijo_der(pos);
     size_t pos_h_izq = buscar_pos_hijo_izq(pos);
 
-    size_t pos_mayor = buscar_pos_max_tres(heap, pos, pos_h_izq, pos_h_der);
+    size_t pos_mayor = buscar_pos_max_tres(arr, cmp, largo, pos, pos_h_izq, pos_h_der);
 
     if (pos_mayor != pos) {
-        swap(heap->arreglo, pos, pos_mayor, sizeof(void*));
-        downheap(heap, pos_mayor);
+        swap(arr, pos, pos_mayor, sizeof(void*));
+        downheap(arr, largo, cmp, pos_mayor);
     }
 }
 
@@ -190,7 +187,7 @@ void *heap_desencolar(heap_t *heap) {
     heap->arreglo[0] = heap->arreglo[heap->cantidad - 1];
 
     heap->cantidad--;
-    downheap(heap, 0);
+    downheap(heap->arreglo, heap->cantidad, heap->cmp, 0);
 
     if (heap->cantidad <= heap->capacidad / DISP_DECREMENTO && heap->capacidad > CAPACIDAD_INICIAL) {
         if (!redimensionar_heap(heap, heap->capacidad / FACTOR_REDIMENSION)) return NULL; 
@@ -198,6 +195,28 @@ void *heap_desencolar(heap_t *heap) {
     return elem;
 }
 
-// void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp) { NO SE SI ES PRIMITIVA
+// VERSION 1
+// void _heap_sort(void *elementos[], size_t largo, cmp_func_t cmp) {
+//     if (largo == 0) return;
 
+//     swap(elementos, 0, largo, sizeof(void*));
+//     downheap(elementos, 0, cmp, largo);
+
+//     _heap_sort(elementos, largo - 1, cmp);
 // }
+
+// void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp) { 
+//     heapify(elementos);
+//     _heap_sort(elementos, cant - 1, cmp);
+// }
+
+// VERSION 2
+void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp) { 
+    heapify(elementos);
+    size_t largo = cant - 1;
+
+    for (size_t i = 0; i < cant; i++, largo--) {
+        swap(elementos, 0, largo, sizeof(void*));
+        downheap(elementos, 0, cmp, largo);
+    }
+}
