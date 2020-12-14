@@ -53,6 +53,25 @@ void _lista_destruir(void* lista) {
 	lista_destruir(lista, NULL);
 }
 
+void swap_size_t(size_t* x, size_t* y) {
+    size_t aux = *x;
+    *x = *y;
+    *y = aux;
+}
+
+void ordenar_arr(size_t* arr, size_t largo) {
+	size_t pos_act = largo;
+
+	for (size_t i = 0; i < largo && pos_act != 0; i++) {
+		if (arr[pos_act] > arr[pos_act - 1]) {
+			swap_size_t(&arr[pos_act], &arr[pos_act - 1]);
+			pos_act--;
+		}
+		else return;
+
+	} 
+}
+
 /* ******************************************************************
  *                 NUESTRAS PRUEBAS (ELIMINAR)
  * *****************************************************************/
@@ -142,6 +161,39 @@ static void prueba_upheap() {
 
 	heap_destruir(heap, NULL);
 }
+
+void imprimir_arreglo_size_t(size_t* arr, size_t largo) {
+    printf("[");
+    for (size_t i = 0; i < largo; i++) {
+        printf("%zu", arr[i]);
+        if (i != largo - 1) {
+            printf(", ");
+        }
+    }
+    printf("]\n");
+}
+
+void prueba_ordenar() {
+	size_t largo = 9;
+	size_t arr[largo];
+
+	arr[0] = 5;
+	ordenar_arr(arr, 0);
+	imprimir_arreglo_size_t(arr, 1);
+
+	arr[1] = 3;
+	ordenar_arr(arr, 1);
+	imprimir_arreglo_size_t(arr, 2);
+
+	arr[2] = 7;
+	ordenar_arr(arr, 2);
+	imprimir_arreglo_size_t(arr, 3);
+
+	arr[3] = 9;
+	ordenar_arr(arr, 3);
+	imprimir_arreglo_size_t(arr, 4);
+}
+
 
 /* ******************************************************************
  *                 PRUEBAS PRIMITIVAS HEAP
@@ -256,57 +308,6 @@ static void prueba_encolar_null() {
 	heap_destruir(heap, NULL);
 }
 
-void swap_size_t(size_t* x, size_t* y) {
-    size_t aux = *x;
-    *x = *y;
-    *y = aux;
-}
-
-void imprimir_arreglo_size_t(size_t* arr, size_t largo) {
-    printf("[");
-    for (size_t i = 0; i < largo; i++) {
-        printf("%zu", arr[i]);
-        if (i != largo - 1) {
-            printf(", ");
-        }
-    }
-    printf("]\n");
-}
-
-void ordenar_arr(size_t* arr, size_t largo) {
-	size_t pos_act = largo;
-
-	for (size_t i = 0; i < largo && pos_act != 0; i++) {
-		if (arr[pos_act] > arr[pos_act - 1]) {
-			swap_size_t(&arr[pos_act], &arr[pos_act - 1]);
-			pos_act--;
-		}
-		else return;
-
-	} 
-}
-
-void prueba_ordenar() {
-	size_t largo = 9;
-	size_t arr[largo];
-
-	arr[0] = 5;
-	ordenar_arr(arr, 0);
-	imprimir_arreglo_size_t(arr, 1);
-
-	arr[1] = 3;
-	ordenar_arr(arr, 1);
-	imprimir_arreglo_size_t(arr, 2);
-
-	arr[2] = 7;
-	ordenar_arr(arr, 2);
-	imprimir_arreglo_size_t(arr, 3);
-
-	arr[3] = 9;
-	ordenar_arr(arr, 3);
-	imprimir_arreglo_size_t(arr, 4);
-}
-
 void _prueba_de_volumen(size_t cantidad_elementos) {
 
 	heap_t* heap = heap_crear(cmp_ints);
@@ -326,14 +327,12 @@ void _prueba_de_volumen(size_t cantidad_elementos) {
 		ordenar_arr(valores_en_orden, i);
 
 		if (!heap_encolar(heap, &valores[i])) resultado_encolar = false;
-		imprimir_heap_int(heap);
+		//imprimir_heap_int(heap);
 		if (*(size_t*)heap_ver_max(heap) != valores_en_orden[0]) resultado_ver_max  = false;
 		if (heap_cantidad(heap) != i + 1) resultado_cantidad = false;
 
-		valores_en_orden[i] = valores[i];
-		ordenar_arr(valores_en_orden, i);
 	}
-	imprimir_arreglo_size_t(valores_en_orden, cantidad_elementos);
+	//imprimir_arreglo_size_t(valores_en_orden, cantidad_elementos);
 
 	print_test("Se encolaron todos lo elementos", resultado_encolar);
 	print_test("Ver el maximo del heap siempre devuelve el mayor", resultado_ver_max);
@@ -348,11 +347,11 @@ void _prueba_de_volumen(size_t cantidad_elementos) {
 	resultado_cantidad = true;
 
 	for (size_t i = 0; i < cantidad_elementos / 2; i++) {
-		printf("ver max devuelve: %zu\n", *(size_t*)heap_ver_max(heap));
+		//printf("ver max devuelve: %zu\n", *(size_t*)heap_ver_max(heap));
 		if (*(size_t*)heap_ver_max(heap) != valores_en_orden[i]) resultado_ver_max_pre = false;
 		if (*(size_t*)heap_desencolar(heap) != valores_en_orden[i]) resultado_desencolar = false;
-		imprimir_heap_int(heap);
-		printf("despues ver max devuelve: %zu\n", *(size_t*)heap_ver_max(heap));
+		//imprimir_heap_int(heap);
+		//printf("despues ver max devuelve: %zu\n", *(size_t*)heap_ver_max(heap));
 		if (*(size_t*)heap_ver_max(heap) != valores_en_orden[i + 1]) resultado_ver_max_post = false;
 		if (heap_cantidad(heap) != cantidad_elementos - i - 1) resultado_cantidad = false;
 	}
@@ -366,19 +365,103 @@ void _prueba_de_volumen(size_t cantidad_elementos) {
 	heap_destruir(heap, NULL);
 }
 
+void _prueba_de_volumen_con_arr(size_t cantidad_elementos) {
+
+	size_t valores_en_orden[cantidad_elementos];
+	void* valores_arr[cantidad_elementos / 2];
+	size_t valores_arr_aux[cantidad_elementos / 2];
+	size_t valores[cantidad_elementos / 2];
+
+	/* inicializa valores random en valores_arr */
+	for (size_t i = 0; i < cantidad_elementos / 2; i++) {
+		valores_arr_aux[i] = rand();
+		valores_en_orden[i] = valores_arr_aux[i];
+		ordenar_arr(valores_en_orden, i);
+
+		valores_arr[i] = &valores_arr_aux[i];
+	}
+
+	//CREAR HEAP CON ARR
+
+	heap_t* heap = heap_crear_arr(valores_arr, cantidad_elementos / 2, cmp_ints);
+
+	print_test("El heap se creo", heap);
+	print_test("La cantidad de elementos es igual a la del arreglo inicial", heap_cantidad(heap) == cantidad_elementos / 2);
+
+	//ENCOLA, la otra mitad de los elementos 
+
+	/* pruebas */
+	bool resultado_encolar = true;
+	bool resultado_ver_max = true;
+	bool resultado_cantidad = true;
+
+	for (size_t i = cantidad_elementos / 2; i < cantidad_elementos; i++) {
+		valores[i] = rand();
+		valores_en_orden[i] = valores[i];
+		ordenar_arr(valores_en_orden, i);
+
+		if (!heap_encolar(heap, &valores[i])) resultado_encolar = false;
+		//imprimir_heap_int(heap);
+		if (*(size_t*)heap_ver_max(heap) != valores_en_orden[0]) resultado_ver_max  = false;
+		if (heap_cantidad(heap) != i + 1) resultado_cantidad = false;
+
+	}
+	//imprimir_arreglo_size_t(valores_en_orden, cantidad_elementos);
+
+	print_test("Se encolaron todos lo elementos", resultado_encolar);
+	print_test("Ver el maximo del heap siempre devuelve el mayor", resultado_ver_max);
+	print_test("La cantidad de elementos se actualizo correctamente", resultado_cantidad);
+
+	// DESENCOLA TODOS
+	
+	/* pruebas */
+	bool resultado_desencolar = true;
+	bool resultado_ver_max_pre = true;
+	bool resultado_ver_max_post = true;
+	resultado_cantidad = true;
+
+	for (size_t i = 0; i < cantidad_elementos; i++) {
+		//printf("ver max devuelve: %zu\n", *(size_t*)heap_ver_max(heap));
+		if (*(size_t*)heap_ver_max(heap) != valores_en_orden[i]) resultado_ver_max_pre = false;
+		if (*(size_t*)heap_desencolar(heap) != valores_en_orden[i]) resultado_desencolar = false;
+		//imprimir_heap_int(heap);
+		//printf("despues ver max devuelve: %zu\n", *(size_t*)heap_ver_max(heap));
+		if (*(size_t*)heap_ver_max(heap) != valores_en_orden[i + 1]) resultado_ver_max_post = false;
+		if (heap_cantidad(heap) != cantidad_elementos - i - 1) resultado_cantidad = false;
+	}
+
+	print_test("Ver maximo devuelve el elemento que se desencolara", resultado_ver_max_pre);
+	print_test("Desencolar la mitad de los elementos", resultado_desencolar);
+	print_test("Ver el maximo luego de desencolar devuelve el proximo mayor", resultado_ver_max_post);
+	print_test("La cantidad de elementos se actualizo correctamente", resultado_cantidad);
+	print_test("La cantidad de elementos es 0", heap_cantidad(heap) == 0);
+
+	/* destruye el heap con la mitad de los elementos encolado */
+	heap_destruir(heap, NULL);
+}
+
 static void prueba_de_volumen() {
 
-	printf("\n> Prueba de volumen con 5000 elementos\n");
-	_prueba_de_volumen(5);
+	printf("\n> Prueba de volumen con arreglo vacio (5000 elementos)\n");
+	_prueba_de_volumen(10);
+	//_prueba_de_volumen(5000);
 
-	printf("\n> Prueba de volumen con 10000 elementos\n");
+	printf("\n> Prueba de volumen con arreglo vacio (10000 elementos)\n");
 	//_prueba_de_volumen(10000);
+
+	printf("\n> Prueba de volumen con arreglo inicial(5000 elementos)\n");
+	_prueba_de_volumen_con_arr(10);
+	//_prueba_de_volumen_con_arr(5000);
+
+	printf("\n> Prueba de volumen con arreglo inicial(10000 elementos)\n");
+	//_prueba_de_volumen_con_arr(10000);
 }
 
 void nuestras_pruebas() {
 	nuestras_pruebas_marce();
 	//prueba_upheap();
 	//prueba_encolar();
+	//prueba_ordenar();
 }
 
 void pruebas_heap_estudiante() {
@@ -388,7 +471,6 @@ void pruebas_heap_estudiante() {
 	// prueba_destruir_heap_con_free();
 	// prueba_destruir_heap_con_otra_funcion_de_destruccion();
 	// prueba_encolar_null();
-	//prueba_ordenar();
 	prueba_de_volumen(); // AGREGAR CON HEAP_CREAR_ARR?!!
 	// prueba_heap_sort();
 	//nuestras_pruebas();
