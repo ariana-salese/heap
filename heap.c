@@ -214,7 +214,8 @@ bool heap_encolar(heap_t *heap, void *elem) {
 }
 
 void *heap_ver_max(const heap_t *heap) {
-    return heap->arreglo[0];
+    if (heap->cantidad != 0) return heap->arreglo[0];
+    return NULL;
 }
 
 void *heap_desencolar(heap_t *heap) {
