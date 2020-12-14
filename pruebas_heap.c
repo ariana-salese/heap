@@ -132,14 +132,12 @@ void nuestras_pruebas_marce() {
 		imprimir_heap_int(heap);
 		printf("\n\n");
 	}
+
+	heap_destruir(heap, NULL);
 }
 
 void prueba_crear_con_arr_marce() {
 
-<<<<<<< HEAD
-	heap_destruir(heap, NULL);
-
-=======
 	int arr[] = {5, 0, 8, 9, 6, 2, 1, 7, 5, 4, 3, 10, 2, 14, -4};
 	void* arr_2[] = {arr, arr+1, arr+2, arr+3, arr+4, arr+5, arr+6, arr+7, arr+8, arr+9, arr+10, arr+11, arr+12, arr+13, arr+14};
 	//int arr_final[] = {14, 8, 10, 7, 6, 5, 9, 0, 5, 4, 3, 2, 2, 1, -4}; //lo verifique a mano asi que lo podemos usar pa las pruebas  
@@ -155,7 +153,7 @@ void prueba_crear_con_arr_marce() {
 	}
 
 	heap_destruir(heap, NULL);
->>>>>>> main
+
 }
 
 static void prueba_upheap() {
