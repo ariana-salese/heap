@@ -32,6 +32,15 @@ size_t capacidad(heap_t* heap) {
     return heap->capacidad;
 }
 
+void imprimir_arr_int(void *arr[], size_t n) {
+    printf("[");
+    for (size_t i = 0; i < n; i++) {
+        printf("%i", *(int*)arr[i]);
+        if (i != n - 1) printf(", ");
+    }
+    printf("]\n");
+}
+
 /* ******************************************************************
  *                       FUNCIONES AUXILIARES
  * *****************************************************************/
@@ -57,13 +66,10 @@ void swap(void *arr, size_t i, size_t j, size_t size) {
     memcpy((a + size * j), temp, size);
 }
 
-size_t buscar_pos_max_tres (heap_t* heap, size_t pos_padre, size_t pos_h_izq, size_t pos_h_der) {
-    size_t largo = heap->cantidad;
-    void** arr = heap->arreglo;
-    cmp_func_t cmp = heap->cmp;
- 
-    if (pos_h_izq > largo) return pos_padre; //arbol izq, si noy hay hijo izq no hay der
-    if (pos_h_der > largo) return cmp(arr[pos_padre], arr[pos_h_izq]) > 0 ? pos_padre : pos_h_izq;
+size_t buscar_pos_max_tres (void* arr[], cmp_func_t cmp, size_t largo, size_t pos_padre, size_t pos_h_izq, size_t pos_h_der) {
+ 	
+    if (pos_h_izq >= largo) return pos_padre; //arbol izq, si noy hay hijo izq no hay der
+    if (pos_h_der >= largo) return cmp(arr[pos_padre], arr[pos_h_izq]) > 0 ? pos_padre : pos_h_izq;
 
     void* hijo_der = arr[pos_h_der];
     void* hijo_izq = arr[pos_h_izq];
@@ -86,27 +92,40 @@ void upheap(heap_t* heap, size_t pos) {
 	upheap(heap, pos_padre);
 }
 
-void downheap(heap_t* heap, size_t pos) {
-    if (pos >= heap->cantidad - 1) return;
+void downheap(void* arr[], size_t largo, cmp_func_t cmp, size_t pos) {
+    if (pos >= largo - 1) return;
     
     size_t pos_h_der = buscar_pos_hijo_der(pos);
     size_t pos_h_izq = buscar_pos_hijo_izq(pos);
 
-    size_t pos_mayor = buscar_pos_max_tres(heap, pos, pos_h_izq, pos_h_der);
+    size_t pos_mayor = buscar_pos_max_tres(arr, cmp, largo, pos, pos_h_izq, pos_h_der);
 
     if (pos_mayor != pos) {
-        swap(heap->arreglo, pos, pos_mayor, sizeof(void*));
-        downheap(heap, pos_mayor);
+        swap(arr, pos, pos_mayor, sizeof(void*));
+        downheap(arr, largo, cmp, pos_mayor);
     }
 }
 
-heap_t* _heap_crear(cmp_func_t cmp) {
+void heapify(void *elementos[], size_t largo, cmp_func_t cmp) {
+	for (size_t i = largo; i > 0; i--) {	
+		downheap(elementos, largo, cmp, i - 1);
+	}
+}
+
+heap_t* _heap_crear(cmp_func_t cmp, size_t capacidad) {
     heap_t* heap = malloc(sizeof(heap_t));
     if (!heap) return NULL;
 
+    void** arreglo = malloc(sizeof(void*) * capacidad);
+    if (!arreglo) {
+        free(heap);
+        return NULL;
+    }
+
     heap->cmp = cmp;
     heap->cantidad = 0;
-    heap->capacidad = CAPACIDAD_INICIAL;
+    heap->capacidad = capacidad;
+    heap->arreglo = arreglo;
 
     return heap;
 }
@@ -126,25 +145,40 @@ bool redimensionar_heap(heap_t* heap, size_t nueva_capacidad) {
  * *****************************************************************/
 
 heap_t *heap_crear(cmp_func_t cmp) {
-    heap_t* heap =_heap_crear(cmp);
+    heap_t* heap =_heap_crear(cmp, CAPACIDAD_INICIAL);
     if (!heap) return NULL;
-
-    void** arreglo = malloc(sizeof(void*) * CAPACIDAD_INICIAL);
-    if (!arreglo) {
-        free(heap);
-        return NULL;
-    }
-
-    heap->arreglo = arreglo;
 
     return heap;
 }
 
-// heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp) {
-//     heap_t* heap =_heap_crear(cmp);
-//     if (!heap) return NULL;
+heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp) {
+    size_t capacidad = CAPACIDAD_INICIAL;
+    if (n == capacidad) capacidad = CAPACIDAD_INICIAL * FACTOR_REDIMENSION;
+    if (n > capacidad * 2) capacidad = CAPACIDAD_INICIAL * FACTOR_REDIMENSION * n;
 
-// }
+	heap_t* heap =_heap_crear(cmp, capacidad);
+	if (!heap) return NULL;
+
+	heapify(arreglo, n, cmp);
+
+	for (size_t i = 0; i < n; i++) {
+        heap->arreglo[i] = arreglo[i];
+    }
+    /*
+    Si no fue creado dinamicamente despues colapsa destruir, serian muchas cosas a verificar. 
+    porque si se redimensiono deberiamos liberarlo. pero si no, no. entonces habria que 
+    verificar que que fie creado con arr y no se redimensiono. ni idea jeje. 
+
+    ademas se podria modificar desde afuera
+    
+    si se te ocurre una forma mas elegante joya. 
+
+    Con lo que puse sigue cumpliendo con la complejidad
+    */
+	heap->cantidad = n;
+
+	return heap;
+}
 
 void heap_destruir(heap_t *heap, void (*destruir_elemento)(void *e)) {
     void** arr = heap->arreglo;
@@ -191,7 +225,7 @@ void *heap_desencolar(heap_t *heap) {
     heap->arreglo[0] = heap->arreglo[heap->cantidad - 1];
 
     heap->cantidad--;
-    downheap(heap, 0);
+    downheap(heap->arreglo, heap->cantidad, heap->cmp, 0);
 
     if (heap->cantidad <= heap->capacidad / DISP_DECREMENTO && heap->capacidad > CAPACIDAD_INICIAL) {
         if (!redimensionar_heap(heap, heap->capacidad / FACTOR_REDIMENSION)) return NULL; 
@@ -199,6 +233,28 @@ void *heap_desencolar(heap_t *heap) {
     return elem;
 }
 
-// void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp) { NO SE SI ES PRIMITIVA
+// VERSION 1
+// void _heap_sort(void *elementos[], size_t largo, cmp_func_t cmp) {
+//     if (largo == 0) return;
 
+//     swap(elementos, 0, largo, sizeof(void*));
+//     downheap(elementos, 0, cmp, largo);
+
+//     _heap_sort(elementos, largo - 1, cmp);
 // }
+
+// void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp) { 
+//     heapify(elementos);
+//     _heap_sort(elementos, cant - 1, cmp);
+// }
+
+// VERSION 2
+void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp) { 
+    heapify(elementos, cant, cmp);
+    size_t largo = cant - 1;
+
+    for (size_t i = 0; i < cant; i++, largo--) {
+        swap(elementos, 0, largo, sizeof(void*));
+        downheap(elementos, 0, cmp, largo);
+    }
+}

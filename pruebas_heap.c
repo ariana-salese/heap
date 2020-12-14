@@ -132,9 +132,30 @@ void nuestras_pruebas_marce() {
 		imprimir_heap_int(heap);
 		printf("\n\n");
 	}
+}
 
+void prueba_crear_con_arr_marce() {
+
+<<<<<<< HEAD
 	heap_destruir(heap, NULL);
 
+=======
+	int arr[] = {5, 0, 8, 9, 6, 2, 1, 7, 5, 4, 3, 10, 2, 14, -4};
+	void* arr_2[] = {arr, arr+1, arr+2, arr+3, arr+4, arr+5, arr+6, arr+7, arr+8, arr+9, arr+10, arr+11, arr+12, arr+13, arr+14};
+	//int arr_final[] = {14, 8, 10, 7, 6, 5, 9, 0, 5, 4, 3, 2, 2, 1, -4}; //lo verifique a mano asi que lo podemos usar pa las pruebas  
+
+	heap_t* heap = heap_crear_arr(arr_2, CANTIDAD_ELEMENTOS, cmp_ints);
+
+	imprimir_heap_int(heap);
+
+	for(int i = 0; i < CANTIDAD_ELEMENTOS; i++){
+		printf("Desencolo, recibí: %d\n", *((int*)heap_desencolar(heap)));
+		imprimir_heap_int(heap);
+		printf("\n\n");
+	}
+
+	heap_destruir(heap, NULL);
+>>>>>>> main
 }
 
 static void prueba_upheap() {
@@ -212,6 +233,29 @@ static void prueba_crear_heap_vacio() {
 	heap_destruir(heap, NULL);
 }
 
+static void prueba_crear_heap_con_arr() {
+	printf("\n> Prueba crear heap con arreglo:\n");
+
+	int aux[] = {5, 0, 8, 9, 6, 2, 1, 7, 5, 4, 3, 10, 2, 14, -4};
+	void* arreglo[CANTIDAD_ELEMENTOS];
+
+	for (size_t i = 0; i < CANTIDAD_ELEMENTOS; i++) arreglo[i] = &aux[i];
+
+	size_t cantidad = (size_t)CANTIDAD_ELEMENTOS;
+
+	heap_t* heap = heap_crear_arr(arreglo, cantidad, cmp_ints);
+
+	print_test("Se creo el heap", heap);
+	print_test("La cantidad de elementos es la del arrelgo", heap_cantidad(heap) == CANTIDAD_ELEMENTOS);
+	print_test("Ver maximo", *(int*)heap_ver_max(heap) == 14);
+	print_test("Desencolar devuelve el maximo", *(int*)heap_desencolar(heap) == 14);
+	print_test("Ver maximo es el proximo mas grande", *(int*)heap_ver_max(heap) == 10);
+	print_test("Desencolar devuelve el maximo", *(int*)heap_desencolar(heap) == 10);
+	print_test("La cantidad de elementos es correcta", heap_cantidad(heap) == CANTIDAD_ELEMENTOS - 2);
+
+	heap_destruir(heap, NULL);
+}
+
 static void prueba_insertar() {
 	printf("\n> Prueba insertar algunos elementos\n");
 	heap_t* heap = heap_crear(cmp_ints);
@@ -247,7 +291,7 @@ static void prueba_insertar() {
 }
 
 static void prueba_destruir_heap_con_free() {
-	printf("\n> Prueba destruir con free\n");
+	printf("\n> Prueba destruir con free:\n");
 
 	heap_t* heap = heap_crear(cmp_str);
 
@@ -272,7 +316,7 @@ static void prueba_destruir_heap_con_free() {
 }
 
 static void prueba_destruir_heap_con_otra_funcion_de_destruccion() {
-	printf("\n> Prueba destruir con otra funcion de destruccion\n");
+	printf("\n> Prueba destruir con otra funcion de destruccion:\n");
 
 	heap_t* heap = heap_crear(cmp_lista);
 
@@ -296,7 +340,7 @@ static void prueba_destruir_heap_con_otra_funcion_de_destruccion() {
 }
 
 static void prueba_encolar_null() {
-	printf("\n> Prueba encolar NULL\n");
+	printf("\n> Prueba encolar NULL:\n");
 
 	heap_t* heap = heap_crear(cmp_str);
 
@@ -458,7 +502,8 @@ static void prueba_de_volumen() {
 }
 
 void nuestras_pruebas() {
-	nuestras_pruebas_marce();
+	//nuestras_pruebas_marce();
+	// prueba_crear_con_arr_marce();
 	//prueba_upheap();
 	//prueba_encolar();
 	//prueba_ordenar();
