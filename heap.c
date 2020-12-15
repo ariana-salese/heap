@@ -28,6 +28,15 @@ void imprimir_heap_int(heap_t* heap) {
     printf("]\n");
 }
 
+void imprimir_heap_size_t(heap_t* heap) {
+    printf("[");
+    for (size_t i = 0; i < heap->cantidad; i++) {
+        printf("%zu", *(size_t*)heap->arreglo[i]);
+        if (i != heap->cantidad - 1) printf(", ");
+    }
+    printf("]\n");
+}
+
 size_t capacidad(heap_t* heap) {
     return heap->capacidad;
 }
@@ -57,13 +66,10 @@ size_t buscar_pos_hijo_izq (size_t pos_padre) {
     return 2 * pos_padre + 1;
 }
 
-void swap(void *arr, size_t i, size_t j, size_t size) {
-    char temp[size];
-    char *a = (char*)arr;
-
-    memcpy(temp, (a + size * i), size);
-    memcpy((a + size * i), (a + size * j), size);
-    memcpy((a + size * j), temp, size);
+void swap(void **x, void** y) {
+    void* aux = *x;
+    *x = *y;
+    *y = aux;
 }
 
 size_t buscar_pos_max_tres (void* arr[], cmp_func_t cmp, size_t largo, size_t pos_padre, size_t pos_h_izq, size_t pos_h_der) {
@@ -88,7 +94,7 @@ void upheap(heap_t* heap, size_t pos) {
 
 	if(heap->cmp(heap->arreglo[pos], heap->arreglo[pos_padre]) <= 0) return;
 
-	swap(heap->arreglo, pos, pos_padre, sizeof(heap->arreglo[0]));
+	swap(&heap->arreglo[pos], &heap->arreglo[pos_padre]);
 	upheap(heap, pos_padre);
 }
 
@@ -101,7 +107,7 @@ void downheap(void* arr[], size_t largo, cmp_func_t cmp, size_t pos) {
     size_t pos_mayor = buscar_pos_max_tres(arr, cmp, largo, pos, pos_h_izq, pos_h_der);
 
     if (pos_mayor != pos) {
-        swap(arr, pos, pos_mayor, sizeof(void*));
+        swap(&arr[pos], &arr[pos_mayor]);
         downheap(arr, largo, cmp, pos_mayor);
     }
 }
@@ -164,17 +170,7 @@ heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp) {
 	for (size_t i = 0; i < n; i++) {
         heap->arreglo[i] = arreglo[i];
     }
-    /*
-    Si no fue creado dinamicamente despues colapsa destruir, serian muchas cosas a verificar. 
-    porque si se redimensiono deberiamos liberarlo. pero si no, no. entonces habria que 
-    verificar que que fie creado con arr y no se redimensiono. ni idea jeje. 
 
-    ademas se podria modificar desde afuera
-    
-    si se te ocurre una forma mas elegante joya. 
-
-    Con lo que puse sigue cumpliendo con la complejidad
-    */
 	heap->cantidad = n;
 
 	return heap;
@@ -201,7 +197,7 @@ bool heap_esta_vacio(const heap_t *heap) {
 }
 
 bool heap_encolar(heap_t *heap, void *elem) {
-
+    //printf("++++EN ENCOLAR++++\n");
     if (!elem) return false;
 
 	heap->arreglo[heap->cantidad] = elem;
@@ -210,6 +206,8 @@ bool heap_encolar(heap_t *heap, void *elem) {
     heap->cantidad++;
 
     if (heap->capacidad == heap->cantidad) return redimensionar_heap(heap, heap->capacidad * FACTOR_REDIMENSION);
+    //imprimir_heap_int(heap);
+   // printf("----CHAU ENCOLAR----\n");
     return true;
 }
 
@@ -254,7 +252,7 @@ void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp) {
     size_t largo = cant - 1;
 
     for (size_t i = 0; i < cant; i++, largo--) {
-        swap(elementos, 0, largo, sizeof(void*));
+        swap(elementos[0], elementos[largo]);
         downheap(elementos, 0, cmp, largo);
     }
 }
