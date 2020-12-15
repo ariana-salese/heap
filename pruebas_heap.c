@@ -538,7 +538,7 @@ static void prueba_de_volumen() {
 static void prueba_heap_sort() {
 	printf("\n> Prueba heap sort:\n");
 
-	size_t cantidad_elementos = 5;
+	size_t cantidad_elementos = 2000;
 	size_t arr_aux[cantidad_elementos];
 	void* arr[cantidad_elementos];
 	size_t arr_en_orden[cantidad_elementos];
