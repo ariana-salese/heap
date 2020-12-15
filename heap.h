@@ -33,9 +33,6 @@ void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp);
 /* Tipo utilizado para el heap. */
 typedef struct heap heap_t;
 
-//ELIMINAR
-void imprimir_heap(heap_t* heap);
-
 /* Crea un heap. Recibe como único parámetro la función de comparación a
  * utilizar. Devuelve un puntero al heap, el cual debe ser destruido con
  * heap_destruir().
@@ -91,5 +88,6 @@ void pruebas_heap_estudiante(void);
 //Eliminar
 void imprimir_heap_int(heap_t* heap);
 size_t capacidad(heap_t* heap);
+void imprimir_heap_size_t(heap_t* heap);
 
 #endif  // HEAP_H
