@@ -86,6 +86,18 @@ void imprimir_arreglo_int(int* arr, size_t largo) {
     printf("]\n");
 }
 
+void imprimir_arreglo_int_void(void** arr, size_t largo) {
+	printf("[");
+    for (size_t i = 0; i < largo; i++) {
+        printf("%i", *(int*)arr[i]);
+        if (i != largo - 1) {
+            printf(", ");
+        }
+    }
+    printf("]\n");
+}
+
+
 static void prueba_encolar() {
 	printf("\n> Prueba encolar algunos elementos:\n");
 
@@ -220,6 +232,30 @@ bool arr_ordenado(size_t* arr, size_t cant) {
 		}
 	}
 	return true;
+}
+
+void mini_prueba_heap_sort() {
+	printf("\n> Prueba heap sort:\n");
+	/* la hago peque para probar, desp hago en volumen */
+
+	bool resultado_orden = true;
+	size_t cantidad = (size_t)CANTIDAD_ELEMENTOS;	
+
+	int aux[] = {5, 2, 6, 8, 34, 6, 87, 33, 12, 0, 4, -1, 23, 7, 9};
+	int en_orden[] = {-1, 0, 2, 4, 5, 6, 6, 7, 8, 9, 12, 23, 33, 34, 87};
+	void* arreglo[CANTIDAD_ELEMENTOS];
+
+	for (size_t i = 0; i < CANTIDAD_ELEMENTOS; i++) arreglo[i] = &aux[i];
+
+	heap_sort(arreglo, cantidad, cmp_ints);
+	printf("Se aplico heap_sort\n");
+	imprimir_arreglo_int_void(arreglo, cantidad);
+
+	for (size_t i = 0; i < CANTIDAD_ELEMENTOS; i++) {
+		if (*(int*)arreglo[i] != en_orden[i]) resultado_orden = false;
+	}
+
+	print_test("El arreglo se encuntra ordenado", resultado_orden);
 }
 
 /* ******************************************************************
@@ -486,19 +522,44 @@ void _prueba_de_volumen_con_arr(size_t cantidad_elementos) {
 
 static void prueba_de_volumen() {
 
-	//printf("\n> Prueba de volumen con arreglo vacio (5000 elementos)\n");
-	//_prueba_de_volumen(10);
-	//_prueba_de_volumen(5000);
+	printf("\n> Prueba de volumen con arreglo vacio (5000 elementos)\n");
+	_prueba_de_volumen(5000);
 
 	printf("\n> Prueba de volumen con arreglo vacio (10000 elementos)\n");
 	_prueba_de_volumen(10000);
 
-	//printf("\n> Prueba de volumen con arreglo inicial(5000 elementos)\n");
-	//_prueba_de_volumen_con_arr(10);
-	//_prueba_de_volumen_con_arr(5000);
+	printf("\n> Prueba de volumen con arreglo inicial(5000 elementos)\n");
+	_prueba_de_volumen_con_arr(5000);
 
 	printf("\n> Prueba de volumen con arreglo inicial(10000 elementos)\n");
 	_prueba_de_volumen_con_arr(10000);
+}
+
+static void prueba_heap_sort() {
+	printf("\n> Prueba heap sort:\n");
+
+	size_t cantidad_elementos = 5;
+	size_t arr_aux[cantidad_elementos];
+	void* arr[cantidad_elementos];
+	size_t arr_en_orden[cantidad_elementos];
+	bool resultado_orden = true;
+
+	for (size_t i = 0; i < cantidad_elementos; i++) {
+		arr_aux[i] = rand();
+		arr_en_orden[i] = arr_aux[i];
+		arr[i] = &arr_aux[i];
+
+		ordenar_arr(arr_en_orden, i);
+	}
+
+	heap_sort(arr, cantidad_elementos, cmp_ints);
+	printf("Se aplico heapsort\n");
+
+	for (size_t i = 0, j = cantidad_elementos - 1; i < cantidad_elementos; i++, j--) {
+		if (*(int*)arr[i] != arr_en_orden[j]) resultado_orden = false;
+	}
+
+	print_test("EL arreglo se encuentra en orden", resultado_orden);
 }
 
 void nuestras_pruebas() {
@@ -507,6 +568,7 @@ void nuestras_pruebas() {
 	//prueba_upheap();
 	//prueba_encolar();
 	//prueba_ordenar();
+	//mini_prueba_heap_sort();
 }
 
 void pruebas_heap_estudiante() {
@@ -517,8 +579,8 @@ void pruebas_heap_estudiante() {
 	prueba_destruir_heap_con_otra_funcion_de_destruccion();
 	prueba_encolar_null();
 	prueba_de_volumen();
-	//prueba_heap_sort();
-	//nuestras_pruebas();
+	prueba_heap_sort();
+	nuestras_pruebas();
 }
 
 // //#ifndef CORRECTOR
