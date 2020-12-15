@@ -197,7 +197,6 @@ bool heap_esta_vacio(const heap_t *heap) {
 }
 
 bool heap_encolar(heap_t *heap, void *elem) {
-    //printf("++++EN ENCOLAR++++\n");
     if (!elem) return false;
 
 	heap->arreglo[heap->cantidad] = elem;
@@ -206,8 +205,6 @@ bool heap_encolar(heap_t *heap, void *elem) {
     heap->cantidad++;
 
     if (heap->capacidad == heap->cantidad) return redimensionar_heap(heap, heap->capacidad * FACTOR_REDIMENSION);
-    //imprimir_heap_int(heap);
-   // printf("----CHAU ENCOLAR----\n");
     return true;
 }
 
@@ -231,28 +228,12 @@ void *heap_desencolar(heap_t *heap) {
     return elem;
 }
 
-// VERSION 1
-// void _heap_sort(void *elementos[], size_t largo, cmp_func_t cmp) {
-//     if (largo == 0) return;
-
-//     swap(elementos, 0, largo, sizeof(void*));
-//     downheap(elementos, 0, cmp, largo);
-
-//     _heap_sort(elementos, largo - 1, cmp);
-// }
-
-// void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp) { 
-//     heapify(elementos);
-//     _heap_sort(elementos, cant - 1, cmp);
-// }
-
-// VERSION 2
 void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp) { 
     heapify(elementos, cant, cmp);
     size_t largo = cant - 1;
 
     for (size_t i = 0; i < cant; i++, largo--) {
-        swap(elementos[0], elementos[largo]);
-        downheap(elementos, 0, cmp, largo);
+        swap(&elementos[0], &elementos[largo]);
+        downheap(elementos, largo, cmp, 0);
     }
 }
