@@ -562,6 +562,56 @@ static void prueba_heap_sort() {
 	print_test("EL arreglo se encuentra en orden", resultado_orden);
 }
 
+static void prueba_uso_completo() {
+	printf("\n> Prueba uso completo:\n");
+
+	int arr_ini_aux[] = {3, 5, 1, 1, 1, 6, 3, -7};
+	int arr_enc[] = {8, 2, 15, 10, 2, 9, -4};
+	int arr_orden[] = {15, 10, 9, 8, 6, 5, 3, 3, 2, 2, 1, 1, 1, -4, -7};
+
+	void* arr_ini[CANTIDAD_ELEMENTOS/2 + 1];
+	for (size_t i = 0; i < CANTIDAD_ELEMENTOS/2 + 1; i++) arr_ini[i] = arr_ini_aux + i;
+
+	heap_t* heap = heap_crear_arr(arr_ini, CANTIDAD_ELEMENTOS/2 + 1, cmp_ints);
+
+	print_test("Se creo el heap", heap);
+	print_test("La cantidad de elementos es correcta", heap_cantidad(heap) == CANTIDAD_ELEMENTOS/2 + 1);
+	print_test("El máximo es el esperado", *((int*)heap_ver_max(heap)) == 6);
+
+	print_test("No se puede encolar NULL", !heap_encolar(heap, NULL));
+	print_test("La cantidad de elementos sigue siendo la misma", heap_cantidad(heap) == CANTIDAD_ELEMENTOS/2 + 1);
+	print_test("El máximo es el mismo", *((int*)heap_ver_max(heap)) == 6);
+
+	bool resultado_encolar = true;
+	bool resultado_cantidad = true;
+	
+	for (size_t i = 0; i < CANTIDAD_ELEMENTOS / 2 && resultado_encolar; i++) {
+		if (!heap_encolar(heap, arr_enc + i)) resultado_encolar = false;
+		if (heap_cantidad(heap) != CANTIDAD_ELEMENTOS / 2 + i + 2) resultado_cantidad = false;
+	}
+
+	print_test("Se encolaron varios elementos", resultado_encolar);
+	print_test("La cantidad de elementos se actualizo correctamente", resultado_cantidad);
+	print_test("El máximo es el esperado", *((int*)heap_ver_max(heap)) == arr_orden[0]);
+
+	printf("Desencolo la mitad de los elementos\n");
+
+	bool resultado_desencolar = true;
+	resultado_cantidad = true;
+
+	for (size_t i = 0; i < CANTIDAD_ELEMENTOS / 2; i++) {
+
+		if (*(size_t*)heap_desencolar(heap) != arr_orden[i]) resultado_desencolar = false;
+		if (heap_cantidad(heap) != CANTIDAD_ELEMENTOS - i - 1) resultado_cantidad = false;
+	}
+
+	print_test("Se desencolaron la mitad de los elementos", resultado_encolar);
+	print_test("La cantidad de elementos se actualizo correctamente", resultado_cantidad);
+	print_test("El máximo es el esperado", *((int*)heap_ver_max(heap)) == arr_orden[CANTIDAD_ELEMENTOS / 2]);
+	printf("Destruyo el heap\n");
+	heap_destruir(heap, NULL);
+}
+
 void nuestras_pruebas() {
 	//nuestras_pruebas_marce();
 	// prueba_crear_con_arr_marce();
@@ -580,6 +630,7 @@ void pruebas_heap_estudiante() {
 	prueba_encolar_null();
 	prueba_de_volumen();
 	prueba_heap_sort();
+	prueba_uso_completo();
 	nuestras_pruebas();
 }
 
