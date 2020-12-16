@@ -1,6 +1,7 @@
 #include "heap.h"
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define CAPACIDAD_INICIAL 20
 #define FACTOR_REDIMENSION 2
@@ -17,24 +18,25 @@ struct heap {
  *                       FUNCIONES AUXILIARES
  * *****************************************************************/
 
+// Recibe la posición de un elemento y devuelve la posición del padre
 size_t buscar_pos_padre (size_t pos_hijo) {
     return (pos_hijo - 1) / 2;
 }
-
+// Recibe la posición de un elemento y devuelve la posición del hijo derecho
 size_t buscar_pos_hijo_der (size_t pos_padre) {
     return 2 * pos_padre + 2;
 }
-
+// Recibe la posición de un elemento y devuelve la posición del hijo izquierdo
 size_t buscar_pos_hijo_izq (size_t pos_padre) {
     return 2 * pos_padre + 1;
 }
-
+// Recibe dos punteros e intercambia las posiciones a las que apuntan
 void swap(void **x, void** y) {
     void* aux = *x;
     *x = *y;
     *y = aux;
 }
-
+// Recibe un arreglo, una función de comparación y las posiciones del padre y ambos hijos, y devuelve la pos del mayor de los tres
 size_t buscar_pos_max_tres (void* arr[], cmp_func_t cmp, size_t largo, size_t pos_padre, size_t pos_h_izq, size_t pos_h_der) {
  	
     if (pos_h_izq >= largo) return pos_padre; //arbol izq, si noy hay hijo izq no hay der
@@ -128,11 +130,8 @@ heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp) {
 	heap_t* heap =_heap_crear(cmp, capacidad);
 	if (!heap) return NULL;
 
-	heapify(arreglo, n, cmp);
-
-	for (size_t i = 0; i < n; i++) {
-        heap->arreglo[i] = arreglo[i];
-    }
+	memcpy(heap->arreglo, arreglo, n * sizeof(void*));
+	heapify(heap->arreglo, n, cmp);
 
 	heap->cantidad = n;
 
