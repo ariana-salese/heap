@@ -1,8 +1,6 @@
 #include "heap.h"
 #include <stdbool.h>
 #include <stdlib.h>
-#include <stdio.h> //Borrar
-#include <string.h> //Para Swap
 
 #define CAPACIDAD_INICIAL 20
 #define FACTOR_REDIMENSION 2
@@ -14,41 +12,6 @@ struct heap {
     size_t capacidad;
     cmp_func_t cmp;
 };
-
-/* ******************************************************************
- *                              (ELIMINAR)
- * *****************************************************************/
-
-void imprimir_heap_int(heap_t* heap) {
-    printf("[");
-    for (size_t i = 0; i < heap->cantidad; i++) {
-        printf("%i", *(int*)heap->arreglo[i]);
-        if (i != heap->cantidad - 1) printf(", ");
-    }
-    printf("]\n");
-}
-
-void imprimir_heap_size_t(heap_t* heap) {
-    printf("[");
-    for (size_t i = 0; i < heap->cantidad; i++) {
-        printf("%zu", *(size_t*)heap->arreglo[i]);
-        if (i != heap->cantidad - 1) printf(", ");
-    }
-    printf("]\n");
-}
-
-size_t capacidad(heap_t* heap) {
-    return heap->capacidad;
-}
-
-void imprimir_arr_int(void *arr[], size_t n) {
-    printf("[");
-    for (size_t i = 0; i < n; i++) {
-        printf("%i", *(int*)arr[i]);
-        if (i != n - 1) printf(", ");
-    }
-    printf("]\n");
-}
 
 /* ******************************************************************
  *                       FUNCIONES AUXILIARES
@@ -88,7 +51,7 @@ size_t buscar_pos_max_tres (void* arr[], cmp_func_t cmp, size_t largo, size_t po
 }
 
 void upheap(heap_t* heap, size_t pos) {
-	if(pos == 0) return; // LLegue al inicio del arreglo 
+	if(pos == 0) return;
 
 	size_t pos_padre = buscar_pos_padre(pos);
 
@@ -176,7 +139,7 @@ heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp) {
 	return heap;
 }
 
-void heap_destruir(heap_t *heap, void (*destruir_elemento)(void *e)) {
+void heap_destruir(heap_t *heap, void (*destruir_elemento)(void *)) {
     void** arr = heap->arreglo;
 
     if (destruir_elemento) {
@@ -222,7 +185,7 @@ void *heap_desencolar(heap_t *heap) {
     heap->cantidad--;
     downheap(heap->arreglo, heap->cantidad, heap->cmp, 0);
 
-    if (heap->cantidad <= heap->capacidad / DISP_DECREMENTO && heap->capacidad > CAPACIDAD_INICIAL) {
+    if (heap->cantidad <= heap->capacidad / DISP_DECREMENTO && heap->capacidad / FACTOR_REDIMENSION > CAPACIDAD_INICIAL) {
         if (!redimensionar_heap(heap, heap->capacidad / FACTOR_REDIMENSION)) return NULL; 
     }
     return elem;
